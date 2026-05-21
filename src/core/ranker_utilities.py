@@ -3,18 +3,20 @@ import re
 
 from ..utils.FileHandler import FileHandler
 from ..utils.utils import get_user_bool
+from .core_consts import INDEX_RANKING_FILE, PLAYLISTS_CSV_FILE
 
 
-INDEX_RANKING_FILE = "./[rankerapp TARGET]/[rankerapp TARGET] Indexed Ranking.txt"
-PLAYLISTS_CSV_FILE = "./[rankerapp TARGET]/[rankerapp TARGET] Playlists CSV.txt"
-
-
-def index_ranking(input_file=None, write_output=False):
+def index_ranking(input_file=None, write_output=False, in_place=False):
 	if input_file is None:
 		checked_input_file = FileHandler.get_user_input()
 		write_output = get_user_bool("Write Output?")
 	else:
 		checked_input_file = FileHandler.check_file(input_file)
+
+	if not in_place and write_output:
+		in_place = get_user_bool("In Place?")
+
+	m_output_file = checked_input_file if in_place else INDEX_RANKING_FILE
 
 	result = ""
 	
@@ -51,7 +53,7 @@ def index_ranking(input_file=None, write_output=False):
 				result += f'{",".join([str(updated_val)] + _)}'
 	
 	if write_output:
-		FileHandler.write_output(INDEX_RANKING_FILE, result)
+		FileHandler.write_output(m_output_file, result)
 	print(result)	#TODO: PrintHandler
 	return result
 

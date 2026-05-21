@@ -3,10 +3,7 @@ import re
 
 from ..utils.FileHandler import FileHandler
 from ..utils.utils import get_user_bool
-
-
-FOLDERS_TO_PLAYLISTS_FOLDER = "./[rankerapp TARGET]/[rankerapp TARGET] Folders to Playlists"
-PLAYLISTS_FIXER_FOLDER = "./[rankerapp TARGET]/[rankerapp TARGET] Playlists Fixer"
+from .core_consts import FOLDERS_TO_PLAYLISTS_FOLDER, PLAYLISTS_FIXER_FOLDER
 
 
 def folders_to_playlists(input_folder=None, write_output=False):
@@ -47,10 +44,10 @@ def fix_playlists(input_folder=None, write_output=False, pattern=None, replaceme
 	else:
 		checked_input_folder = FileHandler.check_directory(input_folder)
 
-	if in_place:
-		m_output_folder = checked_input_folder
-	else:
-		m_output_folder = PLAYLISTS_FIXER_FOLDER
+	if not in_place and write_output:
+		in_place = get_user_bool("In Place?")
+
+	m_output_folder = checked_input_folder if in_place else PLAYLISTS_FIXER_FOLDER
 
 	if pattern is None:
 		pattern = input("Regex Pattern: ")

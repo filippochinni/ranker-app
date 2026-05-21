@@ -1,6 +1,6 @@
-from ...core.ranker_utilities_funcs import *
-from ...core.music_utilities_funcs import *
-from ...core.ranker_funcs import *
+from ...core.ranker_utilities import *
+from ...core.music_utilities import *
+from ...core.ranker import *
 
 
 class MenuObject:

@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 from json import load as json_load
-from posixpath import dirname
 
 
 class FileHandler:
@@ -13,27 +12,27 @@ class FileHandler:
 		self.input_files = input_files
 		self.output_files = output_files
 
-	def handle_json(self, filename):
-		with open(filename, 'r') as input_file:
-			files_map = json_load(input_file)
+	# def handle_json(self, filename):
+	# 	with open(filename, 'r') as input_file:
+	# 		files_map = json_load(input_file)
 
-		for key, value in files_map.items():
-			reference_path = filename
-			reference_dir = os.path.dirname(reference_path)
+	# 	for key, value in files_map.items():
+	# 		reference_path = filename
+	# 		reference_dir = os.path.dirname(reference_path)
 
-			input_path_join = os.path.join(reference_dir, key)
-			output_path_join = os.path.join(reference_dir, value)
+	# 		input_path_join = os.path.join(reference_dir, key)
+	# 		output_path_join = os.path.join(reference_dir, value)
 
-			input_path = os.path.abspath(input_path_join)
-			output_path = os.path.abspath(output_path_join)
+	# 		input_path = os.path.abspath(input_path_join)
+	# 		output_path = os.path.abspath(output_path_join)
 
-			self.input_files.append(input_path)
-			self.output_files.append(output_path)
+	# 		self.input_files.append(input_path)
+	# 		self.output_files.append(output_path)
 
 	def write_table(self, table, output_file):
 		file_name = os.path.splitext(os.path.basename(output_file))[0]
 
-		if not self._check_differences(table, output_file):
+		if not FileHandler.check_differences_table(table, output_file):
 			return False
 
 		sep = '\t' * 8
@@ -45,7 +44,8 @@ class FileHandler:
 
 		return True
 
-	def _check_differences(self, table, output_file):
+	@staticmethod
+	def check_differences_table(table, output_file):
 		with open(output_file, 'r', encoding='utf-8') as output_file:
 			old_table = output_file.read().partition('\n\n\n')[2]
 
@@ -53,37 +53,7 @@ class FileHandler:
 			return True
 
 		return False
-	
-	# @staticmethod
-	# def check_file(file_to_check, optional=False, is_output=False):
-	# 	if optional and file_to_check.strip() == "":
-	# 		return None
 		
-	# 	file_to_check = file_to_check.strip().strip(f'"')
-	# 	if not is_output and not os.path.isfile(file_to_check):
-	# 		raise FileNotFoundError(f"File not found: {file_to_check}")
-		
-	# 	if is_output:
-	# 		file_dir = os.path.dirname(file_to_check)
-	# 		os.makedirs(file_dir, exist_ok=True)
-
-	# 	return os.path.abspath(file_to_check)
-
-
-	# @staticmethod
-	# def check_directory(dir_to_check, optional=False, is_output=False):
-	# 	if optional and dir_to_check.strip() == "":
-	# 		return None
-		
-	# 	dir_to_check = dir_to_check.strip().strip(f'"')
-	# 	if not os.path.isdir(dir_to_check):
-	# 		return None
-		
-	# 	if is_output:
-	# 		os.makedirs(dir_to_check, exist_ok=True)
-
-	# 	return os.path.abspath(dir_to_check)
-	
 
 	@staticmethod
 	def check_file(file_to_check):
@@ -125,10 +95,4 @@ class FileHandler:
 		
 		for output_file, content in output_map.items():
 			FileHandler.write_output(output_file, content)
-			
 
-# INPUT YES | OUTPUT PRINTED						        --> Ranker Utilities & Music Utilities Print
-# INPUT YES | OUTPUT FILE (folder exists, file maybe)		--> Ranker Utilities Write
-# INPUT YES | OUTPUT FOLDER (upper must exist, curr maybe)	--> Music Utilities Write
-# INPUT NO  | OUTPUT PRINTED								--> Ranking Print
-# INPUT NO  | OUTPUT FILE (folder exists, file maybe)		--> Ranking Write
