@@ -1,8 +1,11 @@
 # Core
-RANKING_INPUT_ROOT = f"./_Raw Rankings_"
-RANKING_OUTPUT_ROOT = f"."
-TARGET_TAG = f"[rankerapp TARGET]"
-TARGET_ROOT = f"../_Projects Hub_/{TARGET_TAG}"
+RANKING_ROOT = f"."
+RANKING_INPUT_ROOT = f"{RANKING_ROOT}/_Raw Rankings_"
+RANKING_OUTPUT_ROOT = f"{RANKING_ROOT}"
+
+# Target
+TARGET_TAG = f"RankerApp [TARGET]"
+TARGET_ROOT = f"{RANKING_ROOT}/../_Projects Hub_/{TARGET_TAG}"
 
 # Ranker Utilities
 INDEX_RANKING_FILE = f"{TARGET_ROOT}/{TARGET_TAG} Indexed Ranking.txt"
@@ -28,3 +31,8 @@ RANKING_FILM_OUTPUT = f"{RANKING_FILM_FOLDER_OUTPUT}/Ranking Film.txt"
 RANKING_MUSICA_CANZONI_OUTPUT = f"{RANKING_MUSICA_FOLDER_OUTPUT}/Ranking Canzoni.txt"
 RANKING_MUSICA_ARTISTI_OUTPUT = f"{RANKING_MUSICA_FOLDER_OUTPUT}/Ranking Artisti.txt"
 RANKING_MUSICA_CANZONIPERARTISTA_FOLDER_OUTPUT = f"{RANKING_MUSICA_FOLDER_OUTPUT}/Ranking Canzoni per Artista"
+
+# Extra - Lista Nomi Anime
+PROJECT_HUB_ROOT = f"{RANKING_ROOT}/../_Projects Hub_"
+LISTA_NOMI_ANIME_INPUT = f"{RANKING_ROOT}/../_Projects Hub_/Lista Nomi Anime - Raw.txt"
+LISTA_NOMI_ANIME_OUTPUT = f"{RANKING_ROOT}/../_Projects Hub_/Lista Nomi Anime.txt"

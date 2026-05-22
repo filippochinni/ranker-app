@@ -1,9 +1,10 @@
 import os
 import re
+import csv
 
 from ..utils.FileHandler import FileHandler
 from ..utils.utils import get_user_bool
-from .core_consts import INDEX_RANKING_FILE, PLAYLISTS_CSV_FILE
+from .core_consts import INDEX_RANKING_FILE, PLAYLISTS_CSV_FILE, RANKING_MUSICA_CANZONI_INPUT, RANKING_MUSICA_ARTISTI_INPUT
 
 
 def index_ranking(input_file=None, write_output=False, in_place=False):
@@ -159,3 +160,68 @@ def playlists_to_csv(input_folder=None, write_output=False):
 	print(result)	#TODO: PrintHandler
 	return result
 
+
+def build_artists_data(write_output=True):
+	if write_output:
+		write_output = get_user_bool("Write Output?")
+
+	FileHandler.check_file(RANKING_MUSICA_CANZONI_INPUT)
+	FileHandler.check_file(RANKING_MUSICA_ARTISTI_INPUT)
+	
+	result_header = []
+	with open(RANKING_MUSICA_ARTISTI_INPUT, 'r', encoding='utf-8', newline='') as csv_file:
+		csv_reader = csv.reader(csv_file)
+		result_header = next(csv_reader)
+	
+	result_dict = {}
+	with open(RANKING_MUSICA_CANZONI_INPUT, 'r', encoding='utf-8', newline='') as csv_file:
+		csv_reader = csv.reader(csv_file)
+		for row in list(csv_reader)[1:]:
+			if not row or not row[2]:
+				continue
+			temp_artist = row[2]
+			temp_rank = row[0]
+			if temp_artist not in result_dict:
+				result_dict[temp_artist] = []
+			result_dict[temp_artist] += [temp_rank]
+	
+	result = f'{_to_csv_row(result_header)}\n\n'
+	for k, v in result_dict.items():
+		field_rank = 'n'
+		field_artist = k
+		field_type = "-----"
+		field_num_songs = len(v)
+		field_avg_rank = f"{sum([int(s) for s in v if s.isdigit()]) / len([t for t in v if t.isdigit()]):.1f}°"
+
+		csv_line = [field_rank, field_artist, field_type, field_num_songs, field_avg_rank]
+		result += f'{_to_csv_row(csv_line)}\n'
+
+	if write_output:
+		FileHandler.write_table(result, RANKING_MUSICA_ARTISTI_INPUT)
+	print(result)	#TODO: PrintHandler
+	return result
+
+
+def search_artist(artist_to_search, input_file=RANKING_MUSICA_CANZONI_INPUT):
+	with open(input_file, 'r', encoding='utf-8', newline='') as csv_file:
+		csv_reader = csv.reader(csv_file)
+		for row in list(csv_reader)[1:]:
+			if not row or not row[2]:
+				continue
+			if row[2].strip().lower() == artist_to_search.strip().lower():
+				return True
+	return False
+
+def get_songs_from_artist(artist_to_search, input_file=RANKING_MUSICA_CANZONI_INPUT):
+	result = []
+	with open(input_file, 'r', encoding='utf-8', newline='') as csv_file:
+		csv_reader = csv.reader(csv_file)
+		header = next(csv_reader)
+		header.pop(2)
+		result = [header,]
+		for row in list(csv_reader)[1:]:
+			if not row or not row[2]:
+				continue
+			if row[2].strip().lower() == artist_to_search.strip().lower():
+				result += [[row[0], row[1], row[3], row[4], row[5],]] # row[6]]] #TODO: fix after testing
+	return result
