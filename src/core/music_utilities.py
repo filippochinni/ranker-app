@@ -2,14 +2,13 @@ import os
 import re
 
 from ..utils.FileHandler import FileHandler
-from ..utils.utils import get_user_bool
 from .core_consts import FOLDERS_TO_PLAYLISTS_FOLDER, PLAYLISTS_FIXER_FOLDER
 
 
 def folders_to_playlists(input_folder=None, write_output=False):
 	if input_folder is None:
 		checked_input_folder = FileHandler.get_user_input(is_directory=True)
-		write_output = get_user_bool("Write Output?")
+		write_output = FileHandler.get_user_bool("Write Output?")
 	else:
 		checked_input_folder = FileHandler.check_directory(input_folder)
 
@@ -40,12 +39,12 @@ def folders_to_playlists(input_folder=None, write_output=False):
 def fix_playlists(input_folder=None, write_output=False, pattern=None, replacement=None, in_place=False):
 	if input_folder is None:
 		checked_input_folder = FileHandler.get_user_input(is_directory=True)
-		write_output = get_user_bool("Write Output?")
+		write_output = FileHandler.get_user_bool("Write Output?")
 	else:
 		checked_input_folder = FileHandler.check_directory(input_folder)
 
 	if not in_place and write_output:
-		in_place = get_user_bool("In Place?")
+		in_place = FileHandler.get_user_bool("In Place?")
 
 	m_output_folder = checked_input_folder if in_place else PLAYLISTS_FIXER_FOLDER
 

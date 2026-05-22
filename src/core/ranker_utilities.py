@@ -3,19 +3,18 @@ import re
 import csv
 
 from ..utils.FileHandler import FileHandler
-from ..utils.utils import get_user_bool
 from .core_consts import INDEX_RANKING_FILE, PLAYLISTS_CSV_FILE, RANKING_MUSICA_CANZONI_INPUT, RANKING_MUSICA_ARTISTI_INPUT
 
 
 def index_ranking(input_file=None, write_output=False, in_place=False):
 	if input_file is None:
 		checked_input_file = FileHandler.get_user_input()
-		write_output = get_user_bool("Write Output?")
+		write_output = FileHandler.get_user_bool("Write Output?")
 	else:
 		checked_input_file = FileHandler.check_file(input_file)
 
 	if not in_place and write_output:
-		in_place = get_user_bool("In Place?")
+		in_place = FileHandler.get_user_bool("In Place?")
 
 	m_output_file = checked_input_file if in_place else INDEX_RANKING_FILE
 
@@ -23,7 +22,7 @@ def index_ranking(input_file=None, write_output=False, in_place=False):
 	
 	with open(checked_input_file, "r", newline="", encoding='utf-8') as fr:
 		header = fr.readline()
-		result += f'\n{header}'
+		result += f'{header}'
 		
 		simple_counter = 0
 		counter_map = {}
@@ -59,7 +58,7 @@ def index_ranking(input_file=None, write_output=False, in_place=False):
 	return result
 
 
-def _to_csv_row(values):
+def to_csv_row(values):
     csv_fields = []
     for v in values:
         field = str(v)
@@ -119,7 +118,7 @@ WHITELIST = {
 def playlists_to_csv(input_folder=None, write_output=False):
 	if input_folder is None:
 		checked_input_folder = FileHandler.get_user_input(is_directory=True)
-		write_output = get_user_bool("Write Output?")
+		write_output = FileHandler.get_user_bool("Write Output?")
 	else:
 		checked_input_folder = FileHandler.check_directory(input_folder)
 
@@ -150,10 +149,10 @@ def playlists_to_csv(input_folder=None, write_output=False):
 				parts_rel_rank = f'{count}°/{len(f_lines)}'
 				
 				csv_line = ['n', parts_song, parts_artist, '----', parts_watch, parts_playlist, parts_rel_rank]
-				result += f'{_to_csv_row(csv_line)}\n'
+				result += f'{to_csv_row(csv_line)}\n'
 				
 				count -= 1
-		result += f'{_to_csv_row([])}\n'
+		result += f'{to_csv_row([])}\n'
 	
 	if write_output:
 		FileHandler.write_output(PLAYLISTS_CSV_FILE, result)
@@ -163,7 +162,7 @@ def playlists_to_csv(input_folder=None, write_output=False):
 
 def build_artists_data(write_output=True):
 	if write_output:
-		write_output = get_user_bool("Write Output?")
+		write_output = FileHandler.get_user_bool("Write Output?")
 
 	FileHandler.check_file(RANKING_MUSICA_CANZONI_INPUT)
 	FileHandler.check_file(RANKING_MUSICA_ARTISTI_INPUT)
@@ -185,7 +184,7 @@ def build_artists_data(write_output=True):
 				result_dict[temp_artist] = []
 			result_dict[temp_artist] += [temp_rank]
 	
-	result = f'{_to_csv_row(result_header)}\n\n'
+	result = f'{to_csv_row(result_header)}\n\n'
 	for k, v in result_dict.items():
 		field_rank = 'n'
 		field_artist = k
@@ -194,34 +193,10 @@ def build_artists_data(write_output=True):
 		field_avg_rank = f"{sum([int(s) for s in v if s.isdigit()]) / len([t for t in v if t.isdigit()]):.1f}°"
 
 		csv_line = [field_rank, field_artist, field_type, field_num_songs, field_avg_rank]
-		result += f'{_to_csv_row(csv_line)}\n'
+		result += f'{to_csv_row(csv_line)}\n'
 
 	if write_output:
-		FileHandler.write_table(result, RANKING_MUSICA_ARTISTI_INPUT)
+		FileHandler.write_output(result, RANKING_MUSICA_ARTISTI_INPUT)
 	print(result)	#TODO: PrintHandler
 	return result
 
-
-def search_artist(artist_to_search, input_file=RANKING_MUSICA_CANZONI_INPUT):
-	with open(input_file, 'r', encoding='utf-8', newline='') as csv_file:
-		csv_reader = csv.reader(csv_file)
-		for row in list(csv_reader)[1:]:
-			if not row or not row[2]:
-				continue
-			if row[2].strip().lower() == artist_to_search.strip().lower():
-				return True
-	return False
-
-def get_songs_from_artist(artist_to_search, input_file=RANKING_MUSICA_CANZONI_INPUT):
-	result = []
-	with open(input_file, 'r', encoding='utf-8', newline='') as csv_file:
-		csv_reader = csv.reader(csv_file)
-		header = next(csv_reader)
-		header.pop(2)
-		result = [header,]
-		for row in list(csv_reader)[1:]:
-			if not row or not row[2]:
-				continue
-			if row[2].strip().lower() == artist_to_search.strip().lower():
-				result += [[row[0], row[1], row[3], row[4], row[5],]] # row[6]]] #TODO: fix after testing
-	return result

@@ -7,8 +7,6 @@ from .view.menu.MenuHandler import MenuHandler
 def main():
 
 	cl_parser = CLParser()
-	file_handler = FileHandler()
-	print_handler = PrintHandler()
 
 	args = cl_parser()
 	# cl_parser.print_namespace()

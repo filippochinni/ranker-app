@@ -1,64 +1,18 @@
 import os
 from datetime import datetime
-from json import load as json_load
 
+
+_RANKING_SEP = '\n\n\n'
 
 class FileHandler:
 	def __init__(self):
-		self.input_files = []
-		self.output_files = []
-
-	def __call__(self, input_files, output_files):
-		self.input_files = input_files
-		self.output_files = output_files
-
-	# def handle_json(self, filename):
-	# 	with open(filename, 'r') as input_file:
-	# 		files_map = json_load(input_file)
-
-	# 	for key, value in files_map.items():
-	# 		reference_path = filename
-	# 		reference_dir = os.path.dirname(reference_path)
-
-	# 		input_path_join = os.path.join(reference_dir, key)
-	# 		output_path_join = os.path.join(reference_dir, value)
-
-	# 		input_path = os.path.abspath(input_path_join)
-	# 		output_path = os.path.abspath(output_path_join)
-
-	# 		self.input_files.append(input_path)
-	# 		self.output_files.append(output_path)
-
-	def write_table(self, table, output_file):
-		file_name = os.path.splitext(os.path.basename(output_file))[0]
-
-		if not FileHandler.check_differences_table(table, output_file):
-			return False
-
-		sep = '\t' * 8
-		timestamp = f"Last Update: {datetime.now().strftime('%Y-%m-%d - %H:%M:%S')}"
-
-		with open(output_file, 'w', encoding='utf-8') as output_file_write:
-			output_file_write.write(f"{file_name}{sep}{timestamp}\n\n\n")
-			output_file_write.write(table)
-
-		return True
-
-	@staticmethod
-	def check_differences_table(table, output_file):
-		with open(output_file, 'r', encoding='utf-8') as output_file:
-			old_table = output_file.read().partition('\n\n\n')[2]
-
-		if old_table != table:
-			return True
-
-		return False
-		
-
+		pass
+	
+	
 	@staticmethod
 	def check_file(file_to_check):
 		file_to_check = file_to_check.strip().strip(f'"')
-		if not os.path.isfile(file_to_check):
+		if not FileHandler.check_file_exists(file_to_check):
 			raise FileNotFoundError(f"File not found: {file_to_check}")
 
 		return os.path.abspath(file_to_check)
@@ -72,9 +26,28 @@ class FileHandler:
 		return os.path.abspath(dir_to_check)
 	
 	@staticmethod
+	def check_file_exists(file_to_check):
+		return os.path.isfile(file_to_check)
+
+	@staticmethod
+	def check_differences_file(existing_file, content, is_ranking=False):
+		if not os.path.isfile(existing_file):
+			return None
+		
+		with open(existing_file, 'r', encoding='utf-8') as existing_file:
+			if is_ranking:
+				old_content = existing_file.read().partition(_RANKING_SEP)[2]
+			else:
+				old_content = existing_file.read()
+
+		if old_content != content:
+			return True
+		return False
+	
+	@staticmethod
 	def get_user_input(is_directory=False):
 		while True:
-			user_input = input(f"{'Directory' if is_directory else 'File'} Path: ")
+			user_input = input(f"\n{'Directory' if is_directory else 'File'} Path: ")
 
 			if is_directory:
 				checked_input = FileHandler.check_directory(user_input)
@@ -84,9 +57,30 @@ class FileHandler:
 				return checked_input
 			
 	@staticmethod
-	def write_output(output_file, content):
-		with open(output_file, 'w', encoding='utf-8') as fw:
-			fw.write(content)
+	def get_user_bool(prompt):
+		while True:
+			user_input = input(f"\n{prompt} (y/n): ").strip().lower()
+			print("\n")
+			if user_input == 'y':
+				return True
+			elif user_input == 'n':
+				return False
+			
+	@staticmethod
+	def write_output(output_file, content, check_diff=False):
+		status = None
+		do_write = True
+		if not os.path.isfile(output_file):
+			status = 0
+		elif check_diff:
+			do_write = FileHandler.check_differences_file(output_file, content)
+			status = 1 if do_write else 2
+
+		if do_write:
+			with open(output_file, 'w', encoding='utf-8') as fw:
+				fw.write(content)
+
+		return status
 
 	@staticmethod
 	def write_output_folder(output_dir, output_map):
@@ -95,4 +89,26 @@ class FileHandler:
 		
 		for output_file, content in output_map.items():
 			FileHandler.write_output(output_file, content)
+
+	@staticmethod
+	def write_table(output_file, table, check_diff=False, is_ranking=False):
+		status = None
+		if not os.path.isfile(output_file):
+			status = 0
+		elif check_diff:
+			if not FileHandler.check_differences_file(output_file, table, is_ranking=is_ranking):
+				status = 2
+				return status
+			else:
+				status = 1
+		
+		result = table
+		if is_ranking:
+			file_name = os.path.splitext(os.path.basename(output_file))[0]
+			sep = '\t' * 8
+			timestamp = f"Last Update: {datetime.now().strftime('%Y-%m-%d - %H:%M:%S')}"
+			result = f"{file_name}{sep}{timestamp}{_RANKING_SEP}" + table
+
+		FileHandler.write_output(output_file, result, check_diff=False)
+		return status
 

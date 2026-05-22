@@ -1,48 +1,43 @@
+import csv
+
 from tablemaker import TableMaker # type: ignore
 
 from ..utils.PrintHandler import PrintHandler
 from ..utils.FileHandler import FileHandler
-from ..utils.utils import get_user_bool
 from .core_consts import *
-from .ranker_utilities import index_ranking, search_artist, get_songs_from_artist, _to_csv_row
+from .ranker_utilities import index_ranking, to_csv_row
 
 
 def _helper_build_ranking(RANKING_INPUT, RANKING_FOLDER_OUTPUT, RANKING_OUTPUT, write_output=True, indexing=False):
-	if write_output:
-		write_output = get_user_bool("Write Output?")
+	RANKING_INPUT = FileHandler.check_file(RANKING_INPUT)
+	RANKING_FOLDER_OUTPUT = FileHandler.check_directory(RANKING_FOLDER_OUTPUT)
+	# RANKING_OUTPUT = FileHandler.check_file(RANKING_OUTPUT)
 
-	FileHandler.check_file(RANKING_INPUT)
-	FileHandler.check_directory(RANKING_FOLDER_OUTPUT)
-	FileHandler.check_file(RANKING_OUTPUT)
-	
-	print_handler = PrintHandler()
-	file_handler = FileHandler()
-	table_maker = TableMaker()
+	f_print_handler = PrintHandler()
+	f_table_maker = TableMaker()
+
+	object_to_table = RANKING_INPUT
+	if indexing:
+		object_to_table = index_ranking(RANKING_INPUT, write_output=write_output, in_place=True)
+	computed_table = f_table_maker(object_to_table, has_header=True, from_string=indexing)
+
+	PrintHandler.generic_print(computed_table)
+	if write_output:
+		write_output = FileHandler.get_user_bool("Write Output?")
 
 	if write_output:
-		if indexing:
-			index_ranking(RANKING_INPUT, write_output=True, in_place=True)
-		computed_table = table_maker(RANKING_INPUT, has_header=True)
-		changed = file_handler.write_table(computed_table, RANKING_OUTPUT)
-		written = changed
+		status = FileHandler.write_table(RANKING_OUTPUT, computed_table, check_diff=True, is_ranking=True)
+		written = True if (status == 0 or status == 1) else False
 	else:
-		obj_to_table = RANKING_INPUT
-		if indexing:
-			obj_to_table = index_ranking(RANKING_INPUT, write_output=False, in_place=True)
-		computed_table = table_maker(obj_to_table, has_header=True, from_string=True)
-		changed = FileHandler.check_differences_table(computed_table, RANKING_OUTPUT)
+		changed = FileHandler.check_differences_file(RANKING_OUTPUT, computed_table, is_ranking=True)
+		status = -1 if changed == None else 1 if changed else 2
 		written = False
 
-	if changed:
-		print_handler.print_status_updated(RANKING_INPUT, computed_table)
-		print_handler.update_resume(RANKING_OUTPUT, 1)
-	else:
-		print_handler.print_status_unchanged(RANKING_OUTPUT, computed_table)
-		print_handler.update_resume(RANKING_OUTPUT, 2)
-
-	PrintHandler.print_written_status(RANKING_OUTPUT, written)
-	print_handler.print_separator()
-	print_handler.print_resume()
+	f_print_handler.print_status(RANKING_INPUT, RANKING_OUTPUT, computed_table, status)
+	f_print_handler.update_resume(RANKING_OUTPUT, status)
+	PrintHandler.print_if_written(RANKING_OUTPUT, written)
+	PrintHandler.print_separator()
+	f_print_handler.print_resume()
 
 
 def build_ranking_canzoni(write_output=True):
@@ -62,7 +57,11 @@ def build_ranking_artisti():
 	)
 
 def build_ranking_canzoni_per_artista():
-	artist, _ = _helper_build_ranking_canzoni_per_artista(RANKING_MUSICA_CANZONI_INPUT)
+	artist, _, stop = _helper_build_ranking_canzoni_per_artista(RANKING_MUSICA_CANZONI_INPUT)
+	if stop:
+		print("Returning...")
+		return
+
 	_helper_build_ranking(
 		RANKING_MUSICA_CANZONI_INPUT.replace("(Canzoni) - Raw.txt", f"(Canzoni - {artist}) - Raw.txt"),
 		RANKING_MUSICA_CANZONIPERARTISTA_FOLDER_OUTPUT,
@@ -71,30 +70,34 @@ def build_ranking_canzoni_per_artista():
 	)
 
 def _helper_build_ranking_canzoni_per_artista(input_file=RANKING_MUSICA_CANZONI_INPUT):
+	f_print_handler = PrintHandler()
 	while True:
-		artist = input("Insert Artist Name: ").strip()
-		if search_artist(artist):
+		input_artist = input("\nInsert Artist Name: ").strip()
+		artist = _search_artist(input_artist)
+		if artist:
+			print('\n')
 			break
-		print("Artist Name not Found.\n")
-	
+		print("Artist Name not Found.")
 	file_to_build = input_file.replace("(Canzoni) - Raw.txt", f"(Canzoni - {artist}) - Raw.txt")
-	write_output = False
-	try:
-		FileHandler.check_file(file_to_build)
-	except:
-		write_output = get_user_bool("Write Output?")
 
-	songs_list = get_songs_from_artist(artist, input_file)
-	result = f'Rank A,{_to_csv_row(songs_list[0])}\n'
-	result += f'{_to_csv_row([])}\n'
+	songs_list = _get_songs_from_artist(artist, input_file)
+	result = f'Rank,{to_csv_row(songs_list[0]).replace("Rank", "R_Abs", 1)}\n'
+	result += f'{to_csv_row([])}\n'
 
 	for s in songs_list[1:]:
-		result += f'n,{_to_csv_row(s)}\n'
+		result += f'n,{to_csv_row(s)}\n'
 
+	PrintHandler.generic_print(result)
+	write_output = FileHandler.get_user_bool("Write Output?")
+
+	status = None
 	if write_output:
-		FileHandler.write_output(file_to_build, result)
-	print(result)	#TODO: PrintHandler
-	return artist, result
+		status = FileHandler.write_output(file_to_build, result, check_diff=True)
+		f_print_handler.update_resume(file_to_build, status)
+		f_print_handler.print_resume()
+
+	stop = False if status in [0,1,2] else True
+	return artist, result, stop
 
 
 def build_ranking_anime():
@@ -121,3 +124,29 @@ def build_ranking_film():
 		RANKING_FILM_OUTPUT,
 		write_output=True, indexing=True
 	)
+
+
+def _search_artist(artist_to_search, input_file=RANKING_MUSICA_CANZONI_INPUT):
+	with open(input_file, 'r', encoding='utf-8', newline='') as csv_file:
+		csv_reader = csv.reader(csv_file)
+		for row in list(csv_reader)[1:]:
+			if not row or not row[2]:
+				continue
+			if row[2].strip().lower() == artist_to_search.strip().lower():
+				return row[2].strip()
+	return None
+
+def _get_songs_from_artist(artist_to_search, input_file=RANKING_MUSICA_CANZONI_INPUT):
+	result = []
+	with open(input_file, 'r', encoding='utf-8', newline='') as csv_file:
+		csv_reader = csv.reader(csv_file)
+		header = next(csv_reader)
+		header.pop(2)
+		result = [header,]
+		for row in list(csv_reader)[1:]:
+			if not row or not row[2]:
+				continue
+			if row[2].strip().lower() == artist_to_search.strip().lower():
+				result += [[row[0], row[1], row[3], row[4], row[5], row[6]]]
+	return result
+
