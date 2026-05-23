@@ -10,6 +10,7 @@ TARGET_ROOT = f"{RANKING_ROOT}/../_Projects Hub_/{TARGET_TAG}"
 # Ranker Utilities
 INDEX_RANKING_FILE = f"{TARGET_ROOT}/{TARGET_TAG} Indexed Ranking.txt"
 PLAYLISTS_CSV_FILE = f"{TARGET_ROOT}/{TARGET_TAG} Playlists CSV.txt"
+RANKING_ARTISTI_BUILDING_FILE = f"{TARGET_ROOT}/{TARGET_TAG} Ranking Musica (Artisti) - Raw.txt"
 
 # Music Utilities
 FOLDERS_TO_PLAYLISTS_FOLDER = f"{TARGET_ROOT}/{TARGET_TAG} Folders to Playlists"

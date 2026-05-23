@@ -5,15 +5,14 @@ from tablemaker import TableMaker # type: ignore
 from ..utils.PrintHandler import PrintHandler
 from ..utils.FileHandler import FileHandler
 from .core_consts import *
-from .ranker_utilities import index_ranking, to_csv_row
+from .ranker_utilities import index_ranking, to_csv_row, was_written_wizard, what_status_wizard
 
 
 def _helper_build_ranking(RANKING_INPUT, RANKING_FOLDER_OUTPUT, RANKING_OUTPUT, write_output=True, indexing=False):
-	RANKING_INPUT = FileHandler.check_file(RANKING_INPUT)
-	RANKING_FOLDER_OUTPUT = FileHandler.check_directory(RANKING_FOLDER_OUTPUT)
-	# RANKING_OUTPUT = FileHandler.check_file(RANKING_OUTPUT)
+	FileHandler.check_file(RANKING_INPUT)
+	FileHandler.check_directory(RANKING_FOLDER_OUTPUT)
 
-	f_print_handler = PrintHandler()
+	f_print_handler = PrintHandler(output_obj='Table')
 	f_table_maker = TableMaker()
 
 	object_to_table = RANKING_INPUT
@@ -27,17 +26,15 @@ def _helper_build_ranking(RANKING_INPUT, RANKING_FOLDER_OUTPUT, RANKING_OUTPUT, 
 
 	if write_output:
 		status = FileHandler.write_table(RANKING_OUTPUT, computed_table, check_diff=True, is_ranking=True)
-		written = True if (status == 0 or status == 1) else False
 	else:
 		changed = FileHandler.check_differences_file(RANKING_OUTPUT, computed_table, is_ranking=True)
-		status = -1 if changed == None else 1 if changed else 2
-		written = False
+		status = what_status_wizard(changed)
 
-	f_print_handler.print_status(RANKING_INPUT, RANKING_OUTPUT, computed_table, status)
+	written = was_written_wizard(write_output, status)
+	f_print_handler.print_status(RANKING_INPUT, RANKING_OUTPUT, computed_table, status, is_written=written)
 	f_print_handler.update_resume(RANKING_OUTPUT, status)
-	PrintHandler.print_if_written(RANKING_OUTPUT, written)
-	PrintHandler.print_separator()
 	f_print_handler.print_resume()
+	PrintHandler.print_separator()
 
 
 def build_ranking_canzoni(write_output=True):
@@ -90,13 +87,20 @@ def _helper_build_ranking_canzoni_per_artista(input_file=RANKING_MUSICA_CANZONI_
 	PrintHandler.generic_print(result)
 	write_output = FileHandler.get_user_bool("Write Output?")
 
-	status = None
 	if write_output:
 		status = FileHandler.write_output(file_to_build, result, check_diff=True)
-		f_print_handler.update_resume(file_to_build, status)
-		f_print_handler.print_resume()
+		stop = False
+	else:
+		changed = FileHandler.check_differences_file(file_to_build, result)
+		status = what_status_wizard(changed)
+		stop = True
 
-	stop = False if status in [0,1,2] else True
+	written = was_written_wizard(write_output, status)
+	f_print_handler.print_status(input_file, file_to_build, result, status, is_written=written)
+	f_print_handler.update_resume(file_to_build, status)
+	f_print_handler.print_resume()
+	PrintHandler.print_separator('^')
+
 	return artist, result, stop
 
 

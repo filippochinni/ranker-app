@@ -48,6 +48,7 @@ class FileHandler:
 	def get_user_input(is_directory=False):
 		while True:
 			user_input = input(f"\n{'Directory' if is_directory else 'File'} Path: ")
+			print("\n")
 
 			if is_directory:
 				checked_input = FileHandler.check_directory(user_input)
@@ -83,12 +84,14 @@ class FileHandler:
 		return status
 
 	@staticmethod
-	def write_output_folder(output_dir, output_map):
+	def write_output_folder(output_dir, output_map, check_diff=False):
 		FileHandler.check_directory(os.path.dirname(output_dir))
 		os.makedirs(output_dir, exist_ok=True)
 		
+		status_dict = {}
 		for output_file, content in output_map.items():
-			FileHandler.write_output(output_file, content)
+			status_dict[output_file] = FileHandler.write_output(output_file, content, check_diff=check_diff)
+		return status_dict
 
 	@staticmethod
 	def write_table(output_file, table, check_diff=False, is_ranking=False):

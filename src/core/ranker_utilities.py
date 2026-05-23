@@ -3,32 +3,27 @@ import re
 import csv
 
 from ..utils.FileHandler import FileHandler
+from ..utils.PrintHandler import PrintHandler
 from .core_consts import INDEX_RANKING_FILE, PLAYLISTS_CSV_FILE, RANKING_MUSICA_CANZONI_INPUT, RANKING_MUSICA_ARTISTI_INPUT
 
 
 def index_ranking(input_file=None, write_output=False, in_place=False):
 	if input_file is None:
 		checked_input_file = FileHandler.get_user_input()
-		write_output = FileHandler.get_user_bool("Write Output?")
 	else:
 		checked_input_file = FileHandler.check_file(input_file)
 
-	if not in_place and write_output:
-		in_place = FileHandler.get_user_bool("In Place?")
+	f_print_handler = PrintHandler()
 
-	m_output_file = checked_input_file if in_place else INDEX_RANKING_FILE
-
-	result = ""
-	
-	with open(checked_input_file, "r", newline="", encoding='utf-8') as fr:
+	result = ""	
+	with open(checked_input_file, "r", encoding='utf-8') as fr:
 		header = fr.readline()
-		result += f'{header}'
+		result += f'{header}\n'
 		
 		simple_counter = 0
 		counter_map = {}
 		for line in fr.readlines():
 			if not line.strip():
-				result += "\n"
 				continue
 			
 			split_line = line.split(",")
@@ -52,23 +47,26 @@ def index_ranking(input_file=None, write_output=False, in_place=False):
 				updated_val = f'{prefix}{counter_map[prefix]}'
 				result += f'{",".join([str(updated_val)] + _)}'
 	
+	PrintHandler.generic_print(result)
+	write_output = FileHandler.get_user_bool("Write Output?")
+
+	if not in_place and write_output:
+		in_place = FileHandler.get_user_bool("In Place?")
+
+	m_output_file = checked_input_file if in_place else INDEX_RANKING_FILE
+
 	if write_output:
-		FileHandler.write_output(m_output_file, result)
-	print(result)	#TODO: PrintHandler
+		status = FileHandler.write_output(m_output_file, result, check_diff=True)
+	else:
+		changed = FileHandler.check_differences_file(m_output_file, result)
+		status = what_status_wizard(changed)
+
+	written = was_written_wizard(write_output, status)
+	f_print_handler.print_status(checked_input_file, m_output_file, result, status, is_written=written)
+	f_print_handler.update_resume(m_output_file, status)
+	f_print_handler.print_resume()
+	PrintHandler.print_separator('^')
 	return result
-
-
-def to_csv_row(values):
-    csv_fields = []
-    for v in values:
-        field = str(v)
-
-        if any(c in field for c in [',', '"', '\n']):
-            field = field.replace('"', '""')
-            field = f'"{field}"'
-
-        csv_fields += [field]
-    return ",".join(csv_fields)
 
 
 BLACKLIST = {
@@ -87,7 +85,6 @@ BLACKLIST = {
 	'Varie 3': '---',
     'Videogame Varie': '---'
 }
-
 WHITELIST = {
     'Playlist 001': '~2018-04',
 	'Playlist 002': '~2019/08',
@@ -118,12 +115,12 @@ WHITELIST = {
 def playlists_to_csv(input_folder=None, write_output=False):
 	if input_folder is None:
 		checked_input_folder = FileHandler.get_user_input(is_directory=True)
-		write_output = FileHandler.get_user_bool("Write Output?")
 	else:
 		checked_input_folder = FileHandler.check_directory(input_folder)
 
+	f_print_handler = PrintHandler()
+	
 	result = ""
-    
 	for filename in os.listdir(checked_input_folder):
 
 		file_path = os.path.join(checked_input_folder, filename)
@@ -154,18 +151,28 @@ def playlists_to_csv(input_folder=None, write_output=False):
 				count -= 1
 		result += f'{to_csv_row([])}\n'
 	
+	PrintHandler.generic_print(result)
+	write_output = FileHandler.get_user_bool("Write Output?")
+
 	if write_output:
-		FileHandler.write_output(PLAYLISTS_CSV_FILE, result)
-	print(result)	#TODO: PrintHandler
+		status = FileHandler.write_output(PLAYLISTS_CSV_FILE, result, check_diff=True)
+	else:
+		changed = FileHandler.check_differences_file(PLAYLISTS_CSV_FILE, result)
+		status = what_status_wizard(changed)
+
+	written = was_written_wizard(write_output, status)
+	f_print_handler.print_status(checked_input_folder, PLAYLISTS_CSV_FILE, result, status, is_written=written)
+	f_print_handler.update_resume(PLAYLISTS_CSV_FILE, status)
+	f_print_handler.print_resume()
+	PrintHandler.print_separator()
 	return result
 
 
-def build_artists_data(write_output=True):
-	if write_output:
-		write_output = FileHandler.get_user_bool("Write Output?")
-
+def build_artists_data(write_output=False):
 	FileHandler.check_file(RANKING_MUSICA_CANZONI_INPUT)
 	FileHandler.check_file(RANKING_MUSICA_ARTISTI_INPUT)
+
+	f_print_handler = PrintHandler()
 	
 	result_header = []
 	with open(RANKING_MUSICA_ARTISTI_INPUT, 'r', encoding='utf-8', newline='') as csv_file:
@@ -195,8 +202,49 @@ def build_artists_data(write_output=True):
 		csv_line = [field_rank, field_artist, field_type, field_num_songs, field_avg_rank]
 		result += f'{to_csv_row(csv_line)}\n'
 
+	PrintHandler.generic_print('\n')
+	PrintHandler.generic_print(result)
+	if not write_output:
+		PrintHandler.colored_print("THIS WRITE IS DANGEROUS!!!") # TODO qui
+		write_output = FileHandler.get_user_bool("Write Output?")
+
 	if write_output:
-		FileHandler.write_output(result, RANKING_MUSICA_ARTISTI_INPUT)
-	print(result)	#TODO: PrintHandler
+		status = FileHandler.write_output(RANKING_MUSICA_ARTISTI_INPUT, result, check_diff=True) # TODO qui e le 3 sotto RANKING_ARTISTI_BUILDING_FILE
+	else:
+		changed = FileHandler.check_differences_file(RANKING_MUSICA_ARTISTI_INPUT, result)
+		status = what_status_wizard(changed)
+
+	written = was_written_wizard(write_output, status)
+	f_print_handler.print_status(RANKING_MUSICA_CANZONI_INPUT, RANKING_MUSICA_ARTISTI_INPUT, result, status, is_written=written)
+	f_print_handler.update_resume(RANKING_MUSICA_ARTISTI_INPUT, status)
+	f_print_handler.print_resume()
+	PrintHandler.print_separator()
 	return result
 
+
+def to_csv_row(values):
+    csv_fields = []
+    for v in values:
+        field = str(v)
+
+        if any(c in field for c in [',', '"', '\n']):
+            field = field.replace('"', '""')
+            field = f'"{field}"'
+
+        csv_fields += [field]
+    return ",".join(csv_fields)
+
+def was_written_wizard(is_write_output, status=None):
+	if not is_write_output:
+		return False
+	written = True if (status == 0 or status == 1) else False
+	return written
+
+def what_status_wizard(was_changed):
+	if was_changed == None:
+		status = 3
+	elif was_changed:
+		status = 1
+	else:
+		status = 2
+	return status
