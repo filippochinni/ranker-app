@@ -46,8 +46,9 @@ class FileHandler:
 	
 	@staticmethod
 	def get_user_input(is_directory=False):
+		print()
 		while True:
-			user_input = input(f"\n{'Directory' if is_directory else 'File'} Path: ")
+			user_input = input(f"{'Directory' if is_directory else 'File'} Path: ")
 			print("\n")
 
 			if is_directory:
@@ -59,8 +60,9 @@ class FileHandler:
 			
 	@staticmethod
 	def get_user_bool(prompt):
+		print()
 		while True:
-			user_input = input(f"\n{prompt} (y/n): ").strip().lower()
+			user_input = input(f"{prompt} (y/n): ").strip().lower()
 			print("\n")
 			if user_input == 'y':
 				return True

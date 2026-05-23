@@ -33,13 +33,11 @@ def index_ranking(input_file=None, write_output=False, in_place=False):
 				result += f'{line}'
 				continue
 			
-			if index_type.isdigit():
+			if index_type.isdigit() or len(index_type) == 1:
 				simple_counter += 1
 				result += f'{",".join([str(simple_counter)] + _)}'
 			else:
-				prefix = list(index_type)[:-1]
-				prefix = "".join(prefix)
-
+				prefix = index_type[0]
 				if not counter_map.get(prefix):
 					counter_map[prefix] = 0
 				counter_map[prefix] += 1
@@ -144,7 +142,7 @@ def playlists_to_csv(input_folder=None, write_output=False):
 				parts_song, parts_artist = song_file.rstrip('.mp3').split(" - ")
 				parts_playlist = filename
 				parts_watch = WHITELIST[filename]
-				parts_rel_rank = f'{count}°/{len(f_lines)}'
+				parts_rel_rank = f'{count}°{f' ' if count<10 else f''}/{len(f_lines)}'
 				
 				csv_line = ['n', parts_song, parts_artist, '----', parts_watch, parts_playlist, parts_rel_rank]
 				result += f'{to_csv_row(csv_line)}\n'
