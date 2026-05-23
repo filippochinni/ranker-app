@@ -47,6 +47,7 @@ def index_ranking(input_file=None, write_output=False, in_place=False):
 				updated_val = f'{prefix}{counter_map[prefix]}'
 				result += f'{",".join([str(updated_val)] + _)}'
 	
+	PrintHandler.generic_print('\n')
 	PrintHandler.generic_print(result)
 	write_output = FileHandler.get_user_bool("Write Output?")
 

@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ranker-app"
-version = "1.0.0"
+version = "1.1.0"
 description = "Utility app for building Rankings and other related utility functionalities."
 readme = "README.md"
 requires-python = ">=3.8"
 authors = [{ name = "Anonip" }]
 dependencies = [
-  "table-maker>=0.3.0",
+  "table-maker>=1.0.0",
 ]
 
 [project.scripts]
