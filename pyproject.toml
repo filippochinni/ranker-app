@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ranker-app"
-version = "1.1.0"
+version = "1.1.1"
 description = "Utility app for building Rankings and other related utility functionalities."
 readme = "README.md"
 requires-python = ">=3.8"
@@ -18,4 +18,4 @@ ranker-app = "rankerapp.__main__:main"
 
 [tool.setuptools]
 package-dir = { "rankerapp" = "src" }
-packages = ["rankerapp"]
+packages = ["rankerapp", "rankerapp.core", 'rankerapp.utils', 'rankerapp.view', 'rankerapp.view.cl', 'rankerapp.view.menu']
