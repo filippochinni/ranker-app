@@ -48,6 +48,7 @@ MENU_LIST = {
 		MenuItem("Build Ranking Canzoni", action=build_ranking_canzoni),
 		MenuItem("Build Ranking Artisti", action=build_ranking_artisti),
 		MenuItem("Build Ranking Canzoni per Artista", action=build_ranking_canzoni_per_artista),
+		MenuItem("Build Ranking Playlist", action=build_ranking_playlist),
 		MenuItem("Back")
 	]),
 	"Ranking Anime": MenuObject("Ranking Anime", [

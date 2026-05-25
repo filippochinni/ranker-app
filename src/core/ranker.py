@@ -64,7 +64,7 @@ def build_ranking_canzoni_per_artista():
 	_helper_build_ranking(
 		RANKING_MUSICA_CANZONI_INPUT.replace("(Canzoni) - Raw.txt", f"(Canzoni - {artist}) - Raw.txt"),
 		RANKING_MUSICA_CANZONIPERARTISTA_FOLDER_OUTPUT,
-		f'{RANKING_MUSICA_CANZONIPERARTISTA_FOLDER_OUTPUT}/{f"Ranking Canzoni - {artist}.txt"}',
+		f'{RANKING_MUSICA_CANZONIPERARTISTA_FOLDER_OUTPUT}/{RANKING_MUSICA_TAG_STR} (Canzoni - {artist}).txt',
 		write_output=True, indexing=True,
 		col_alignment=['center', 'center', 'left', 'center', 'center', 'left']
 	)
@@ -105,6 +105,70 @@ def _helper_build_ranking_canzoni_per_artista(input_file=RANKING_MUSICA_CANZONI_
 	PrintHandler.print_separator('^')
 
 	return artist, result, stop
+
+def build_ranking_playlist():
+	stop = _helper_build_ranking_playlist(RANKING_MUSICA_CANZONI_INPUT)
+	if stop:
+		print("Returning...")
+		return
+
+	_helper_build_ranking(
+		RANKING_MUSICA_PLAYLIST_INPUT,
+		RANKING_MUSICA_FOLDER_OUTPUT,
+		RANKING_MUSICA_PLAYLIST_OUTPUT,
+		write_output=True, indexing=False,
+		col_alignment=['center', 'left', 'center', 'center', 'center']
+	)
+
+def _helper_build_ranking_playlist(input_file=RANKING_MUSICA_CANZONI_INPUT):
+	f_print_handler = PrintHandler()
+	songs_list = _get_all_songs(input_file)
+
+	result_header = []
+	with open(RANKING_MUSICA_PLAYLIST_INPUT, 'r', encoding='utf-8', newline='') as csv_file:
+		csv_reader = csv.reader(csv_file)
+		result_header = next(csv_reader)
+
+	result_dict = {}
+	for s in songs_list[1:]:
+		if s[5] not in result_dict:
+			result_dict[s[5]] = []
+		result_dict[s[5]] += [s[0]]
+
+	csv_line_list = []
+	for k, v in result_dict.items():
+		field_rank = '--'
+		field_playlist = k
+		field_num_songs = len(v)
+		field_avg_rank_temp = sum([int(r) for r in v if r.isdigit()]) / (len([tr for tr in v if tr.isdigit()]) + 0.0001)
+		field_avg_rank = f"{field_avg_rank_temp:.1f}°" if field_avg_rank_temp >= 100 else f"{field_avg_rank_temp:.1f}0°"
+		field_top_50 = f"{len([r for r in v if r.isdigit() and int(r) <= 50])}"
+
+		csv_line_list += [ [field_rank, field_playlist, field_num_songs, field_avg_rank, field_top_50] ]	
+	csv_line_list.sort(key=lambda x: x[1])
+	
+	result = f'{to_csv_row(result_header)}\n\n'
+	for csv_line in csv_line_list: 
+		result += f'{to_csv_row(csv_line)}\n'
+
+	PrintHandler.generic_print(result)
+	write_output = FileHandler.get_user_bool("Write Output?")
+
+	if write_output:
+		status = FileHandler.write_output(RANKING_MUSICA_PLAYLIST_INPUT, result, check_diff=True)
+		stop = False
+	else:
+		changed = FileHandler.check_differences_file(RANKING_MUSICA_PLAYLIST_INPUT, result)
+		status = what_status_wizard(changed)
+		stop = True
+
+	written = was_written_wizard(write_output, status)
+	f_print_handler.print_status(input_file, RANKING_MUSICA_PLAYLIST_INPUT, result, status, is_written=written)
+	f_print_handler.update_resume(RANKING_MUSICA_PLAYLIST_INPUT, status)
+	f_print_handler.print_resume()
+	PrintHandler.print_separator('^')
+
+	return stop
 
 
 def build_ranking_anime():
@@ -158,5 +222,16 @@ def _get_songs_from_artist(artist_to_search, input_file=RANKING_MUSICA_CANZONI_I
 				continue
 			if row[2].strip().lower() == artist_to_search.strip().lower():
 				result += [[row[0], row[1], row[3], row[4], row[5], row[6]]]
+	return result
+
+def _get_all_songs(input_file=RANKING_MUSICA_CANZONI_INPUT):
+	result = []
+	with open(input_file, 'r', encoding='utf-8', newline='') as csv_file:
+		csv_reader = csv.reader(csv_file)
+		next(csv_reader)
+		for row in list(csv_reader):
+			if not row or not row[5]:
+				continue
+			result += [ row ]
 	return result
 
