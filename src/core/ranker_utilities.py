@@ -4,7 +4,7 @@ import csv
 
 from ..utils.FileHandler import FileHandler
 from ..utils.PrintHandler import PrintHandler
-from .core_consts import INDEX_RANKING_FILE, PLAYLISTS_CSV_FILE, RANKING_MUSICA_CANZONI_INPUT, RANKING_MUSICA_ARTISTI_INPUT, RANKING_ARTISTI_BUILDING_FILE
+from .core_consts import INDEX_RANKING_FILE, PLAYLISTS_CSV_FILE
 
 
 def index_ranking(input_file=None, write_output=False, in_place=False):
@@ -142,7 +142,7 @@ def playlists_to_csv(input_folder=None, write_output=False):
 				parts_song, parts_artist = song_file.rstrip('.mp3').split(" - ")
 				parts_playlist = filename
 				parts_watch = WHITELIST[filename]
-				parts_rel_rank = f'{count}°{f' ' if count<10 else f''}/{len(f_lines)}'
+				parts_rel_rank = f'{count}°{f' ' if count<10 else f''}/{f' ' if len(f_lines)<10 else f''}{len(f_lines)}'
 				
 				csv_line = ['n', parts_song, parts_artist, '----', parts_watch, parts_playlist, parts_rel_rank]
 				result += f'{to_csv_row(csv_line)}\n'
@@ -162,63 +162,6 @@ def playlists_to_csv(input_folder=None, write_output=False):
 	written = was_written_wizard(write_output, status)
 	f_print_handler.print_status(checked_input_folder, PLAYLISTS_CSV_FILE, result, status, is_written=written)
 	f_print_handler.update_resume(PLAYLISTS_CSV_FILE, status)
-	f_print_handler.print_resume()
-	PrintHandler.print_separator()
-	return result
-
-
-def build_artists_data(write_output=False):
-	FileHandler.check_file(RANKING_MUSICA_CANZONI_INPUT)
-	FileHandler.check_file(RANKING_MUSICA_ARTISTI_INPUT)
-
-	f_print_handler = PrintHandler()
-	
-	result_header = []
-	with open(RANKING_MUSICA_ARTISTI_INPUT, 'r', encoding='utf-8', newline='') as csv_file:
-		csv_reader = csv.reader(csv_file)
-		result_header = next(csv_reader)
-	
-	result_dict = {}
-	with open(RANKING_MUSICA_CANZONI_INPUT, 'r', encoding='utf-8', newline='') as csv_file:
-		csv_reader = csv.reader(csv_file)
-		for row in list(csv_reader)[1:]:
-			if not row or not row[2]:
-				continue
-			temp_artist = row[2]
-			temp_rank = row[0]
-			if temp_artist not in result_dict:
-				result_dict[temp_artist] = []
-			result_dict[temp_artist] += [temp_rank]
-	
-	result = f'{to_csv_row(result_header)}\n\n'
-	csv_line_list = []
-	for k, v in result_dict.items():
-		field_rank = 'n'
-		field_artist = k
-		field_type = "-----"
-		field_num_songs = len(v)
-		field_avg_rank = f"{sum([int(s) for s in v if s.isdigit()]) / (len([t for t in v if t.isdigit()]) + 0.0001):.1f}°"
-
-		csv_line_list += [ [field_rank, field_artist, field_type, field_num_songs, field_avg_rank] ]
-	
-	csv_line_list.sort(key=lambda x: x[3], reverse=True)
-	for csv_line in csv_line_list: 
-		result += f'{to_csv_row(csv_line)}\n'
-
-	PrintHandler.generic_print('\n')
-	PrintHandler.generic_print(result)
-	if not write_output:
-		write_output = FileHandler.get_user_bool("Write Output?")
-
-	if write_output:
-		status = FileHandler.write_output(RANKING_ARTISTI_BUILDING_FILE, result, check_diff=True)
-	else:
-		changed = FileHandler.check_differences_file(RANKING_ARTISTI_BUILDING_FILE, result)
-		status = what_status_wizard(changed)
-
-	written = was_written_wizard(write_output, status)
-	f_print_handler.print_status(RANKING_MUSICA_CANZONI_INPUT, RANKING_ARTISTI_BUILDING_FILE, result, status, is_written=written)
-	f_print_handler.update_resume(RANKING_ARTISTI_BUILDING_FILE, status)
 	f_print_handler.print_resume()
 	PrintHandler.print_separator()
 	return result

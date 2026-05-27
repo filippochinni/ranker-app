@@ -47,13 +47,78 @@ def build_ranking_canzoni(write_output=True):
 	)
 
 def build_ranking_artisti():
+	stop = _helper_build_ranking_artisti()
+	if stop:
+		print("Returning...")
+		return
 	_helper_build_ranking(
 		RANKING_MUSICA_ARTISTI_INPUT,
 		RANKING_MUSICA_FOLDER_OUTPUT,
 		RANKING_MUSICA_ARTISTI_OUTPUT,
 		write_output=True, indexing=True,
-		col_alignment=['center', 'left', 'left', 'left', 'left']
+		col_alignment=['center', 'left', 'left', 'center', 'left', 'center', 'center', 'center', 'right']
 	)
+
+def _helper_build_ranking_artisti(input_file=RANKING_MUSICA_CANZONI_INPUT):
+	f_print_handler = PrintHandler()
+	
+	origianl_types = {}
+	result_header = []
+	with open(RANKING_MUSICA_ARTISTI_INPUT, 'r', encoding='utf-8', newline='') as csv_file:
+		csv_reader = csv.reader(csv_file)
+		result_header = next(csv_reader)
+		for row in list(csv_reader)[1:]:
+			if not row or not row[1]:
+				continue
+			origianl_types[row[1]] = row[2]
+
+	result_dict = {}
+	songs_list = _get_all_songs(input_file)
+	for s in songs_list:
+		if s[2] not in result_dict:
+			result_dict[s[2]] = []
+		result_dict[s[2]] += [s[0]]
+	print("\n\nTESTESTETSTES\n\n",result_dict)
+	
+	result = f'{to_csv_row(result_header)}\n\n'
+	csv_line_list = []
+	for k, v in result_dict.items():
+		field_rank = 'n'
+		field_artist = k
+		field_type = "-----" if k not in origianl_types else origianl_types[k]
+		field_num_songs = len(v)
+		field_top = f"{min([int(r) for r in v if r.isdigit()])}°"
+		field_top_50 = f"{len([r for r in v if r.isdigit() and int(r) <= 50])}"
+		field_top_25 = f"{len([r for r in v if r.isdigit() and int(r) <= 25])}"
+		field_top_10 = f"{len([r for r in v if r.isdigit() and int(r) <= 10])}"
+		field_avg_rank = f"{sum([int(r) for r in v if r.isdigit()]) / (len([rt for rt in v if rt.isdigit()]) + 0.0001):.1f}"
+
+		csv_line_list += [ [field_rank, field_artist, field_type, field_num_songs, field_top, field_top_50, field_top_25, field_top_10, field_avg_rank] ]
+	csv_line_list.sort(key=lambda x: (x[7], x[3], x[6], x[5]), reverse=True)
+
+	for csv_line in csv_line_list: 
+		result += f'{to_csv_row(csv_line)}\n'
+
+	PrintHandler.generic_print('\n')
+	PrintHandler.generic_print(result)
+	write_output = FileHandler.get_user_bool("Write Output?")
+
+	if write_output:
+		status = FileHandler.write_output(RANKING_MUSICA_ARTISTI_INPUT, result, check_diff=True)
+		stop = False
+	else:
+		changed = FileHandler.check_differences_file(RANKING_MUSICA_ARTISTI_INPUT, result)
+		status = what_status_wizard(changed)
+		stop = True
+
+	written = was_written_wizard(write_output, status)
+	f_print_handler.print_status(RANKING_MUSICA_CANZONI_INPUT, RANKING_MUSICA_ARTISTI_INPUT, result, status, is_written=written)
+	f_print_handler.update_resume(RANKING_MUSICA_ARTISTI_INPUT, status)
+	f_print_handler.print_resume()
+	PrintHandler.print_separator('^')
+
+	return stop
+
 
 def build_ranking_canzoni_per_artista():
 	artist, _, stop = _helper_build_ranking_canzoni_per_artista(RANKING_MUSICA_CANZONI_INPUT)
@@ -66,7 +131,7 @@ def build_ranking_canzoni_per_artista():
 		RANKING_MUSICA_CANZONIPERARTISTA_FOLDER_OUTPUT,
 		f'{RANKING_MUSICA_CANZONIPERARTISTA_FOLDER_OUTPUT}/{RANKING_MUSICA_TAG_STR} (Canzoni - {artist}).txt',
 		write_output=True, indexing=True,
-		col_alignment=['center', 'center', 'left', 'center', 'center', 'left']
+		col_alignment=['center', 'center', 'left', 'center', 'center', 'left', 'center']
 	)
 
 def _helper_build_ranking_canzoni_per_artista(input_file=RANKING_MUSICA_CANZONI_INPUT):
@@ -81,12 +146,13 @@ def _helper_build_ranking_canzoni_per_artista(input_file=RANKING_MUSICA_CANZONI_
 	file_to_build = input_file.replace("(Canzoni) - Raw.txt", f"(Canzoni - {artist}) - Raw.txt")
 
 	songs_list = _get_songs_from_artist(artist, input_file)
-	result = f'Rank,{to_csv_row(songs_list[0]).replace("Rank", "R_Abs", 1)}\n'
+	result = f'Rank,{to_csv_row(songs_list[0]).replace("Rank", "R Abs", 1)}\n'
 	result += f'{to_csv_row([])}\n'
 
 	for s in songs_list[1:]:
-		result += f'n,{to_csv_row(s)}\n'
+		result += f'{'n' if s[0].isdigit() else 'vn'},{to_csv_row(s)}\n'
 
+	PrintHandler.generic_print('\n')
 	PrintHandler.generic_print(result)
 	write_output = FileHandler.get_user_bool("Write Output?")
 
@@ -117,7 +183,7 @@ def build_ranking_playlist():
 		RANKING_MUSICA_FOLDER_OUTPUT,
 		RANKING_MUSICA_PLAYLIST_OUTPUT,
 		write_output=True, indexing=False,
-		col_alignment=['center', 'left', 'center', 'center', 'center']
+		col_alignment=['left', 'center', 'left', 'center', 'center', 'center', 'right']
 	)
 
 def _helper_build_ranking_playlist(input_file=RANKING_MUSICA_CANZONI_INPUT):
@@ -130,27 +196,29 @@ def _helper_build_ranking_playlist(input_file=RANKING_MUSICA_CANZONI_INPUT):
 		result_header = next(csv_reader)
 
 	result_dict = {}
-	for s in songs_list[1:]:
+	for s in songs_list:
 		if s[5] not in result_dict:
 			result_dict[s[5]] = []
 		result_dict[s[5]] += [s[0]]
 
 	csv_line_list = []
 	for k, v in result_dict.items():
-		field_rank = '--'
 		field_playlist = k
 		field_num_songs = len(v)
-		field_avg_rank_temp = sum([int(r) for r in v if r.isdigit()]) / (len([tr for tr in v if tr.isdigit()]) + 0.0001)
-		field_avg_rank = f"{field_avg_rank_temp:.1f}°" if field_avg_rank_temp >= 100 else f"{field_avg_rank_temp:.1f}0°"
+		field_top = f"{min([int(r) for r in v if r.isdigit()])}°"
 		field_top_50 = f"{len([r for r in v if r.isdigit() and int(r) <= 50])}"
+		field_top_25 = f"{len([r for r in v if r.isdigit() and int(r) <= 25])}"
+		field_top_10 = f"{len([r for r in v if r.isdigit() and int(r) <= 10])}"
+		field_avg_rank = f"{sum([int(r) for r in v if r.isdigit()]) / (len([rt for rt in v if rt.isdigit()]) + 0.0001):.1f}"
 
-		csv_line_list += [ [field_rank, field_playlist, field_num_songs, field_avg_rank, field_top_50] ]	
-	csv_line_list.sort(key=lambda x: x[1])
+		csv_line_list += [ [field_playlist, field_num_songs, field_top, field_top_50, field_top_25, field_top_10, field_avg_rank] ]	
+	csv_line_list.sort(key=lambda x: x[0])
 	
 	result = f'{to_csv_row(result_header)}\n\n'
 	for csv_line in csv_line_list: 
 		result += f'{to_csv_row(csv_line)}\n'
 
+	PrintHandler.generic_print('\n')
 	PrintHandler.generic_print(result)
 	write_output = FileHandler.get_user_bool("Write Output?")
 

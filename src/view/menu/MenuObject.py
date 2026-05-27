@@ -35,7 +35,6 @@ MENU_LIST = {
 	"Ranker Utilities": MenuObject("Ranker Utilities", [
 		MenuItem("Index Ranking", action=index_ranking),
 		MenuItem("Playlists to CSV", action=playlists_to_csv),
-		MenuItem("Build Artists Data", action=build_artists_data),
 		MenuItem("Back")
 	]),
 	"Music Utilities": MenuObject("Music Utilities", [
