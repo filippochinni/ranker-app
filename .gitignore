@@ -7,7 +7,9 @@ build/
 
 # Virtual environment
 venv/
+.venv/
 env/
+.env/
 
 # IDE
 .vscode/

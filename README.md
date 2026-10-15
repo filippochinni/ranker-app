@@ -1,13 +1,13 @@
 # Ranker App
 
-RankerApp is a utility app for building Rankings and other related utility functionalities.<br>
+RankerApp is an utility app for building Rankings and other related utility functionalities.<br>
 It is navigable through an old-fashioned Menu Interface.
 
 It is a personal project which follows a structured and clear Manifesto.
 
-## Rankings Manifesto
+## Rankings Manifesto Link
 
-[Rankings Manifesto]
+[Rankings Manifesto](#rankings-manifesto)
 
 ## Usage
 
@@ -22,6 +22,8 @@ It is a personal project which follows a structured and clear Manifesto.
 | Ranking Anime    | Build Ranking Anime               | Build Ranking of Anime from the corrispondent [Raw] version                                |
 | Ranking Anime    | Build Lista Nomi Anime            | Build the Anime Names List from the corrispondent [Raw] version                            |
 | Ranking Film     | Build Ranking Film                | Build Ranking of Films from the corrispondent [Raw] version                                |
+| Ranking Film     | Build Ranking Film (Cartoon)      | Build Ranking of Films (Cartoon) from the corrispondent [Raw] version                      |
+| Ranking Film     | Build Ranking Film (Anime)        | Build Ranking of Films (Anime) from the corrispondent [Raw] version                        |
 | Ranker Utilities | Index Ranking                     | Indexes a List of Entries                                                                  |
 | Ranker Utilities | Playlists to CSV                  | Turns a Folder of Playlist .m3u files into a CSV file                                      |
 | Music Utilities  | Folders to Playlists              | Turns a Folder (and Subfolders) into a .m3u Playlist mapping the Folder's .mp3 files       |
@@ -49,240 +51,261 @@ ranker-app [-h] [-cl]
 
 _______________________________________________________________________________________________________________________
 
-## [Rankings Manifesto]:
+## Rankings Manifesto
 
-(Will be translated in English in the future)
+> Notes: [Leftovers from original italian version: Canzone/Canzoni = Song/Songs; Artista/Artisti = Artist/Artists; Storico = History]
 
-_______________________________________________________________________________________________________________________
+Rankings is a Project that includes Rankings of various types of Medium
 
-Rankings è un progetto che comprende Ranking (Classifiche) di vari tipi di Medium
+Each Ranking is mutable, not only because new Instances of Medium are added, but also because the opinion on an Instance can change over time
 
-Ogni Ranking è mutabile, non solo in quanto vengono aggiunte nuove Istanze di Medium, ma perché l'opinione su una Istanza può cambiare nel tempo
+The main ranking factor is "feeling"<br>
+Some Rankings may have objective classification criteria. If that is not the case, the only factor is "feeling"
 
-Sebbene vengano definite delle Linee Guida per classificare i Medium, il fattore di classificazione principale è il Feeling
+Rankings are made meticulously using a Bottom-Up approach, starting from the worst Items to the best ones
 
-I Ranking sono effettuati con minuzia utilizzando un approccio Bottom-up, partendo dagli Item peggiori per arrivare ai migliori
+The types of Medium currently ranked with a Ranking are the following:
 
-I tipi di Medium attualmente classificati con un Ranking sono i seguenti:
+	Anime  |  Film  |  Canzoni  |  Artisti  |  Playlist
 
-Anime  |  Film  |  Canzoni  |  Artisti
+Each Ranking characterizes the Instances with Attributes, what Attributes are present depends on the Medium
 
-Ogni Ranking caratterizza le Istanze con degli Attributi, gli Attributi presenti dipendono dal Medium
+Rankings update is periodic, without a given timeframe<br>
+Minor Releases can happen at any time; Major Releases should be performed rarely (approximately, at most 2 times a year)
 
+A Minor Release is an update without historicization, the Ranking is modified by overwriting the Current Ranking<br>
+A Major Release is an update with historicization, the Current Ranking is copied and stored in a Storico folder before being updated
 
-L'Update dei Ranking è periodico ma non a tempo fisso
-Le Minor Release possono avvenire in qualsiasi momento; le Major Release vanno eseguite raramente (indicativamente, al massimo 2 volte all'Anno)
+## Glossary:
 
-Una Minor Release è un update senza storicizzazione, si modifica il Ranking sovrascrivendo il Ranking Current
-Una Major Release è un update con storicizzazione, il Ranking Current viene, prima di essere aggiornato, copiato e memorizzato in una cartella Storico
+|                     |                                                                                                                          |
+|---------------------|--------------------------------------------------------------------------------------------------------------------------|
+| **Ranking**         | When "Ranking" is used without further specifications, it refers to the Ranking in Tabular format                        |
+| **Ranking Current** | Current (or Ranking Current) is the current (non-historicized) version of the Ranking                                    |
+| **Ranking Raw**     | Ranking Raw (or Raw) is the Raw version of the Ranking; in csv format, is used by RankerApp to create the Rankings       |
+| **Medium**          | A Medium is intended as a Type of Medium [examples: Music, Anime, Film]                                                  |
+| **Instance**        | An Instance (or Instance of Medium) (or Item) is a single and unique Medium [examples: Song - Music; single Film - Film] |
+| **Entry**           | An Entry is an Instance in table. This term is used when referring to an Instance within the table of the Ranking        |
+| **Attribute**       | An Attribute is a characteristic of an Instance [examples: Artist - Song; Year - Film]                                   |
+| **Category**        | Subset of Instances within a Ranking, usually to cover special cases                                                     |
+| **SubRanking**      | Logical Ranking within a Category                                                                                        |
+| **Rank**            | Ordinal number representing the Position of an Instance in the Ranking (or SubRanking)                                   |
 
 
+___________________________________________________________________________________________________________________________________________________________
 
-////////////
 
-++ Glossario:
+## Ranking Anime
 
-- Ranking:		Quando si utilizza "Ranking" senza ulteriori specificazioni, si intende il Ranking in formato Tabellare
-- Ranking Current:	Current (o Ranking Current) è la versione attuale del Ranking (non una versione storicizzata)
-- Ranking Raw:		Ranking Raw (o Raw) è la versione Raw del Ranking; in formato csv, è utilizzata da RankerApp per creare i Ranking
-- Medium:		Un Medium è inteso come un Tipo (o Categoria) di Medium			[esempi: Musica, Anime, Film]
-- Istanza:		Una Istanza (o Istanza di Medium; o Item) è un singolo e unico Medium	[esempi: Canzone - Musica; singolo Film - Film]
-- Entry:		Una Entry è una Istanza. Si utilizza questo termine quando si intende una Istanza all'intero della tabella del Ranking
-- Attributo:		Un Attributo è una caratteristica di una Istanza			[esempi: Artista - Canzone; Anno - Film]
-- Categoria:		Subset di Istanze all'interno di un Ranking, in genere per coprire casi particolari
+Ranking Anime is the Ranking of Anime<br>
+[For Main Category] Are considered Anime all Anime with standard or long episode duration<br>
+[For Main Category] Are considered only Anime which are concluded (except exceptions)<br>
+An Anime is considered a single time, even if divided into parts that could be considered separate (except exceptions)
 
-////////////
+### Attributes:
 
-++ Note Generali:
+	Rank  |  Anime  |  Year  |  1st Watch
 
--
+|    |           |                                          |
+|----|-----------|------------------------------------------|
+| 1) | Rank      | Rank of the Anime                        |
+| 2) | Anime     | Title of the Anime                       |
+| 3) | Year      | Airing Period of the Anime               |
+| 4) | 1st Watch | Year of 1st Watch (Period in applicable) |
 
-__________________________________________________________________________________________________________________________
+### Notes:
 
+- The Ranking does NOT contain stand-alone Anime Movies, they are contained in the Ranking Film (Anime)
+- Anime Movies that are strictly related to an Anime are considered as integral part of the Anime towards classification
+- Anime which are very long (e.g. One Piece) are considered in the main category even if they are not concluded
+- The Title is written in Romanji if the original title is in Kanji; Usual Style (Title Style)
+- The Anime Title follows the "Canonical Name" defined in Lista Nomi Anime
 
-@ Ranking Anime
+### Categories:
 
+(N is the Rank)
 
-Ranking Anime è il Ranking degli Anime
-Sono considerati Anime tutti gli Anime con durata episodio standard o lunga
-Sono considerati solo Anime conclusi (eccetto eccezioni)
-Un Anime è considerato una volta sola, anche se diviso in parti considerabili distaccate (eccetto eccezioni)
+|    |                                                     |
+|----|-----------------------------------------------------|
+| N  | Anime Concluded                                     |
+| bN | Anime Ongoing                                       |
+| iN | Anime Watch Interrupted                             |
+| mN | Anime Meme (and/or episode duration below standard) |
+| uN | Anime Unranked (to be ranked in the next Release)   |
 
-++ Attributi:		Rank  |  Anime  |  Year  |  1st Watch
 
-1) Rank:	Rank dell'Anime
-2) Anime:	Titolo dell'Anime
-3) Year:	Periodo di Airing dell'Anime
-4) 1st Watch:	Anno 1a Watch (Periodo nei casi adatti)
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-++ Linee Guida:
 
--
+## Ranking Film
 
-++ Note:
+Ranking Film is the Ranking of Films<br>
+It is divided into 3 Rankings: `Film  |  Film (Cartoon)  |  Film (Anime)`<br>
+Are considered Films all full-length Movies (even if short)
 
-- Il Ranking NON contiene Anime Movie stand-alone, essi sono contenuti nel Ranking Film
-- Anime Movie strettamente relativi a un Anime sono considerati parte integrante dell'Anime
-	- (Sono considerati ANCHE singolarmente se hanno buona valenza come stand-alone)
-- Anime molto lunghi (es. One Piece) sono considerati anche se non conclusi
-- Il Titolo è scritto in Romanji se il titolo originale è in Kanji; Stile solito
+### Attributes:
 
-- Nel Ranking si identificano le seguenti Categorie:		// N è il Rank
-	- N		--> Anime Concluso
-	- bN		--> Anime Ongoing
-	- iN		--> Anime Visione Interrotta
-	- mN		--> Anime Meme (e/o durata ep inferiore allo standard)
-	- uN		--> Anime Unranked (da posizionare alla prossima Release)
+	Rank  |  Film  |  Year  |  1st Watch  |  Plays  |  Rating  |  ID Trakt  |  ID IMDb  |  ID TMDB
 
+|    |           |                                         |
+|----|-----------|-----------------------------------------|
+| 1) | Rank      | Rank of the Film                        |
+| 2) | Film      | Title of the Film                       |
+| 3) | Year      | Year of the Film                        |
+| 4) | 1st Watch | Date of 1st Watch                       |
+| 5) | Plays     | Number of Rewatches                     |
+| 6) | Rating    | Rating (score from 1 to 10) of the Film |
+| 7) | ID Trakt  | ID of the Film on Trakt                 |
+| 8) | ID IMDb   | ID of the Film on IMDb                  |
+| 9) | ID TMDB   | ID of the Film on TMDB                  |
 
-//////////////////////////////////////////////////////////////////////////////////////////////
+### Notes:
 
+- The Ranking is sorted according to the Rating Attribute
+- Films with the same Rating are sorted according to "feeling"
+- The Film Title is the one corresponding to the Trakt Title for that Film
+- The Title of Films (Anime) follows the "Canonical Name" defined in Lista Nomi Anime
 
-@ Ranking Film
+### Categories:
 
+(N is the Rank)
 
-Raking Film è il Ranking dei Film
-Sono Considerati Film tutti i Lungometraggi (anche brevi)
+|    |                                                                                         |
+|----|-----------------------------------------------------------------------------------------|
+| N  | Film                                                                                    |
+| vN | Alternative Versions (Re-releases) that are considered different Films by movie DBs |
+| sN | TV Specials of TV Series/Anime/Cartoons that are considered "Films" by movie DBs        |
+| uN | Film Unranked (to be ranked in the next Release)                                        |
 
-++ Attributi:		Rank  |  Film  |  Year  |  1st Watch
 
-1) Rank:	Rank del Film
-2) Film:	Titolo del Film
-3) Year:	Anno del Film
-4) 1st Watch:	Anno 1a Watch
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-++ Linee Guida:
 
--
+## Ranking Canzoni
 
-++ Note:
+Ranking Canzoni is the Ranking of Songs<br>
+Are considered Songs ONLY Japanese Songs (more info in the Notes)<br>
+If a Song already present in the Ranking has alternative Versions, these are placed in the appropriate Category
 
-- Film Live Action e Film Animati saranno divisi in Categorie
-- Film Anime avranno il loro Ranking dedicato in futuro
+### Attributes:
 
+	Rank  |  Song  |  Artist  |  Year  |  1st Listen  |  Playlist |  Rel Rank
 
-//////////////////////////////////////////////////////////////////////////////////////////////
+|    |            |                                   |
+|----|------------|-----------------------------------|
+| 1) | Rank       | Rank of the Song                  |
+| 2) | Song       | Title of the Song                 |
+| 3) | Artist     | Artist of the Song                |
+| 4) | Year       | Year of the Song                  |
+| 5) | 1st Listen | Date of 1st Listen                |
+| 6) | Playlist   | Playlist of the Song              |
+| 7) | Rel Rank   | Relative Position in the Playlist |
 
+### Notes:
 
-@ Ranking Canzoni
+- The Titles of Songs are compliant with the Naming Conventions of Music
+- In this Ranking only Japanese Songs are considered because they represent the vast majority of Songs in question;\
+putting everything together would have been too confusing, as some Italian and English Songs would be at a relatively\
+high Rank, and it would be too difficult and strange to compare the two language blocks.\
+It will be considered in the future to have a specific Ranking for Italian, English and Other Songs
+- Soundtracks (no Vocal) Songs are not considered. In this case too, it will be considered to have a specific Ranking
 
+### Categories:
 
-Ranking Canzoni è il Ranking delle Canzoni
-Sono considerate Canzoni SOLO le Canzoni Giapponesi		// Info nelle Note
-Se una Canzone già presente nel Ranking ha delle Versioni alternative, queste sono poste nella Categoria apposita
+(N is the Rank)
 
-++ Attributi:		Rank  |  Song  |  Artist  |  Year  |  1st Listen  |  Playlist |  Rel Rank
+|    |                                                      |
+|----|------------------------------------------------------|
+| N  | Songs                                                |
+| vN | Alternative Versions of Songs already in the Ranking |
+| uN | Unranked Songs (to be ranked in the next Release)    |
 
-1) Rank:	Rank della Canzone
-2) Song:	Titolo della Canzone
-3) Artist:	Artista della Canzone
-4) Year:	Anno della Canzone
-5) 1st Listen:	Anno 1o Ascolto
-6) Playlist:	Playlist di appartenenza
-7) Rel Rank:	Posizione Relativa nella Playlist
 
-++ Linee Guida:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
--
 
-++ Note:
+## Ranking Canzoni (per Artista)
 
-- I Titoli delle Canzoni sono coerenti con le Naming Conventions della Musica
-- In questo Ranking si considerano solo le canzoni Giapponesi in quanto rappresentano la grande maggioranza delle Canzoni oggetto,\
-  mettere tutto insieme sarebbe stato troppo confuso, in quanto alcune Canzoni Italiane e Inglese sarebbero a un Rank relativamente\
-  alto, e in quanto sarebbe troppo difficile e strano confrontare i due blocchi di Lingue.\
-  Si considera la possibilità futura di un Ranking apposito per Canzoni Italiane, Inglese e Altro
-- Non si considerano le Soundtrack (no Vocal). Anche in questo caso, si considera la possibilità di un Ranking apposito
+Ranking Canzoni - \<Artista\> is the Ranking of Songs for a specific Artist<br>
+Are considered Songs of the Artist all their Full Releases (even Covers, as long as they are Full)<br>
+If a Song which is already present in the Ranking has alternative Versions, these are placed in the appropriate Category
 
-- Nel Ranking si identificano le seguenti Categorie:		// N è il Rank
-	- N		--> Canzoni
-	- vN		--> Versioni Alternative di Canzoni che sono già nel Ranking
-	- uN		--> Canzoni Unranked (da posizionare alla prossima Release)
+### Attributes:
 
+	Rank  |  Song  |  Year  |  1st Listen  |  Playlist  |  Rel Rank
 
-//////////////////////////////////////////////////////////////////////////////////////////////
+|    |            |                                   |
+|----|------------|-----------------------------------|
+| 1) | Rank       | Rank of the Song                  |
+| 2) | Song       | Title of the Song                 |
+| 3) | Year       | Year of the Song                  |
+| 4) | 1st Listen | Date of 1st Listen                |
+| 5) | Playlist   | Playlist of the Song              |
+| 6) | Rel Rank   | Relative Position in the Playlist |
 
+### Notes:
 
-@ Ranking Canzoni (per Artista)
+- The Titles of Songs are compliant with the Naming Conventions of Music
+- The ranks of the Ranking MUST reflect the ranks in Ranking Musica (Canzoni)
 
+### Categories:
 
-Ranking Canzoni - <Artista> è il Ranking delle Canzoni per uno specifico Artista
-Sono considerate Canzoni dell'Artista tutte le sue Full Release (anche le Cover, purché Full)
-Se una Canzone già presente nel Ranking ha delle Versioni alternative, queste sono poste nella Categoria apposita
+(N is the Rank)
 
-++ Attributi:		Rank  |  Song  |  Year  |  1st Listen  |  Playlist  |  Rel Rank
+|    |                                                      |
+|----|------------------------------------------------------|
+| N  | Songs                                                |
+| vN | Alternative Versions of Songs already in the Ranking |
+| uN | Unranked Songs (to be ranked in the next Release)    |
 
-1) Rank:	Rank della Canzone
-2) Song:	Titolo della Canzone
-3) Year:	Anno della Canzone
-4) 1st Listen:	Anno 1o Ascolto
-5) Playlist:	Playlist di appartenenza
-6) Rel Rank:	Posizione Relativa nella Playlist
 
-++ Linee Guida:
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- I posizionamenti del Ranking DEVONO rispecchiare il posizionamento nel Ranking Musica
 
-++ Note:
+## Ranking Artisti
 
-- I Titoli delle Canzoni sono coerenti con le Naming Conventions della Musica
+Ranking Artisti is the Ranking of Artists (of Music Songs)<br>
+Are considered Artists ONLY Japanese Singers and Bands<br>
 
-- Nel Ranking si identificano le seguenti Categorie:		// N è il Rank
-	- N		--> Canzoni
-	- vN		--> Versioni Alternative di Canzoni che sono già nel Ranking
-	- uN		--> Canzoni Unranked (da posizionare alla prossima Release)
+### Attributes:
 
+	Rank  |  Artist  |  Type  |  Num Songs  |  Top  |  Top <50|25|10>  |  Avg Rank
 
-//////////////////////////////////////////////////////////////////////////////////////////////
+|    |           |                                                                                                                                                         |
+|----|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1) | Rank      | Rank of the Artist                                                                                                                                      |
+| 2) | Artist    | Name of the Artist                                                                                                                                      |
+| 3) | Type      | Type of the Artist (<`Solo`\|`Band`\|`Band (Duo)`\|`Solo (Utaite)`\|`Solo (VSinger)`\|`Solo (Seiyuu)`\|`Solo (Anisong)`\|`Band (Project)`\|`Producer`>) |
+| 4) | Num Songs | Number of Songs in Playlist of the Artist                                                                                                               |
+| 5) | Top       | Rank of the Song with the highest Rank of the Artist                                                                                                    |
+| 6) | Top<>     | Number of Songs of the Artist in the Top<>                                                                                                              |
+| 7) | Avg Rank  | Average Rank of the Songs of the Artist                                                                                                                 |
 
+### Notes:
 
-@ Ranking Artisti
+- The name "Ranking Artisti" is ambiguous, but "Artist" is the name used in the mp3 standard
 
 
-Ranking Artisti è il Ranking degli Artisti (Canzoni)
-Sono considerati Artisti SOLO Cantanti e Band Giapponesi
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-++ Attributi:		Rank  |  Artist  |  Type  |  Num Songs  |  Top  |  Top <50|25|10>  |  Avg Rank
 
-1) Rank:	Rank dell'Artista
-2) Artist:	Nome dell'Artista o della Band
-3) Type:	Se l'Artista è una Band o un Singolo
-4) Num Songs:	Numero di Canzoni in Playlist dell'Artista
-5) Top		Rank della Canzone con Rank più alto dell'Artista
-6) Top<>	Numero di Canzoni dell'Artista nella Top<>
-7) Avg Rank:	Rank Medio delle Canzoni dell'Artista
+## Ranking Playlist
 
-++ Linee Guida:
+Ranking Playlist is the Ranking of Playlists of Songs<br>
+Are considered all and only the existing Playlists, which are used to generate this Ranking<br>
 
--
+### Attributes:
 
-++ Note:
+	Playlist  |  Num Songs  |  Top  |  Top <50|25|10>  |  Avg Rank
 
-- Il nome "Ranking Artisti" è ambiguo, ma "Artist" è il nome utilizzato dai Music Player di Samsung e Windows
+|    |           |                                                        |
+|----|-----------|--------------------------------------------------------|
+| 1) | Playlist  | Name of the Playlist                                   |
+| 2) | Num Songs | Number of Songs in the Playlist                        |
+| 3) | Top       | Rank of the Song with the highest Rank of the Playlist |
+| 4) | Top<>     | Number of Songs of the Playlist in the Top<>           |
+| 5) | Avg Rank  | Average Rank of the Songs of the Playlist              |
 
+### Notes:
 
-//////////////////////////////////////////////////////////////////////////////////////////////
-
-
-@ Ranking Playlist
-
-
-Ranking Playlist è il Ranking delle Playlist delle Canzoni
-Sono considerate le Playlist esistenti, da cui questo Ranking viene generato
-
-++ Attributi:		Playlist  |  Num Songs  |  Top  |  Top <50|25|10>  |  Avg Rank
-
-1) Playlist:	Nome della Playlist
-2) Num Songs:	Numero di Canzoni che la Playlist contiene
-3) Top		Rank della Canzone con Rank più alto della Playlist
-4) Top<>	Numero di Canzoni della Playlist nella Top<>
-5) Avg Rank:	Rank Medio delle Canzoni della Playlist
-
-++ Linee Guida:
-
--
-
-++ Note:
-
-- 
-
+- Playlists are sorted by name, they do not have a Rank attribute. This Ranking only has a statistical purpose

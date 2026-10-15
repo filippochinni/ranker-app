@@ -57,6 +57,8 @@ MENU_LIST = {
 	]),
 	"Ranking Film": MenuObject("Ranking Film", [
 		MenuItem("Build Ranking Film", action=build_ranking_film),
+		MenuItem("Build Ranking Film (Cartoon)", action=build_ranking_film_cartoon),
+		MenuItem("Build Ranking Film (Anime)", action=build_ranking_film_anime),
 		MenuItem("Back")
 	])
 }

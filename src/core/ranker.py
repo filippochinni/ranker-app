@@ -61,7 +61,7 @@ def build_ranking_artisti():
 
 def _helper_build_ranking_artisti(input_file=RANKING_MUSICA_CANZONI_INPUT):
 	f_print_handler = PrintHandler()
-	
+
 	origianl_types = {}
 	result_header = []
 	with open(RANKING_MUSICA_ARTISTI_INPUT, 'r', encoding='utf-8', newline='') as csv_file:
@@ -79,7 +79,7 @@ def _helper_build_ranking_artisti(input_file=RANKING_MUSICA_CANZONI_INPUT):
 			result_dict[s[2]] = []
 		result_dict[s[2]] += [s[0]]
 	print("\n\nTESTESTETSTES\n\n",result_dict)
-	
+
 	result = f'{to_csv_row(result_header)}\n\n'
 	csv_line_list = []
 	for k, v in result_dict.items():
@@ -96,7 +96,7 @@ def _helper_build_ranking_artisti(input_file=RANKING_MUSICA_CANZONI_INPUT):
 		csv_line_list += [ [field_rank, field_artist, field_type, field_num_songs, field_top, field_top_50, field_top_25, field_top_10, field_avg_rank] ]
 	csv_line_list.sort(key=lambda x: (x[7], x[3], x[6], x[5]), reverse=True)
 
-	for csv_line in csv_line_list: 
+	for csv_line in csv_line_list:
 		result += f'{to_csv_row(csv_line)}\n'
 
 	PrintHandler.generic_print('\n')
@@ -211,11 +211,11 @@ def _helper_build_ranking_playlist(input_file=RANKING_MUSICA_CANZONI_INPUT):
 		field_top_10 = f"{len([r for r in v if r.isdigit() and int(r) <= 10])}"
 		field_avg_rank = f"{sum([int(r) for r in v if r.isdigit()]) / (len([rt for rt in v if rt.isdigit()]) + 0.0001):.1f}"
 
-		csv_line_list += [ [field_playlist, field_num_songs, field_top, field_top_50, field_top_25, field_top_10, field_avg_rank] ]	
+		csv_line_list += [ [field_playlist, field_num_songs, field_top, field_top_50, field_top_25, field_top_10, field_avg_rank] ]
 	csv_line_list.sort(key=lambda x: x[0])
-	
+
 	result = f'{to_csv_row(result_header)}\n\n'
-	for csv_line in csv_line_list: 
+	for csv_line in csv_line_list:
 		result += f'{to_csv_row(csv_line)}\n'
 
 	PrintHandler.generic_print('\n')
@@ -260,13 +260,30 @@ def build_lista_nomi_anime():
 
 def build_ranking_film():
 	_helper_build_ranking(
-		RANKING_FILM_INPUT,
+		RANKING_FILM_FILM_INPUT,
 		RANKING_FILM_FOLDER_OUTPUT,
-		RANKING_FILM_OUTPUT,
+		RANKING_FILM_FILM_OUTPUT,
 		write_output=True, indexing=True,
-		col_alignment=['center', 'left', 'center', 'center']
+		col_alignment=['center', 'left', 'center', 'center', 'center', 'center', 'left', 'left', 'left']
 	)
 
+def build_ranking_film_cartoon():
+	_helper_build_ranking(
+		RANKING_FILM_CARTOON_INPUT,
+		RANKING_FILM_FOLDER_OUTPUT,
+		RANKING_FILM_CARTOON_OUTPUT,
+		write_output=True, indexing=True,
+		col_alignment=['center', 'left', 'center', 'center', 'center', 'center', 'left', 'left', 'left']
+	)
+
+def build_ranking_film_anime():
+	_helper_build_ranking(
+		RANKING_FILM_ANIME_INPUT,
+		RANKING_FILM_FOLDER_OUTPUT,
+		RANKING_FILM_ANIME_OUTPUT,
+		write_output=True, indexing=True,
+		col_alignment=['center', 'left', 'center', 'center', 'center', 'center', 'left', 'left', 'left']
+	)
 
 def _search_artist(artist_to_search, input_file=RANKING_MUSICA_CANZONI_INPUT):
 	with open(input_file, 'r', encoding='utf-8', newline='') as csv_file:
